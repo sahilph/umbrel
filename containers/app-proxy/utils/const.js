@@ -33,6 +33,21 @@ function readFromEnvOrTerminate(key) {
 	return value;
 }
 
+function readFromFsOrTerminate(value) {
+    fs.stat(value, function (err, stat) {
+        if (err != null) {
+            if (err.code === 'ENOENT') {
+                // file does not exist
+                console.error(`The file '${value}' does not exist. Terminating...`);
+            } else {
+                console.error('Some error occured. Error Code: ', err.code);
+            }
+            process.exit(1);
+        }
+    });
+    return value;
+}
+
 function cleanHttpPaths(str) {
 	return str.split(/[, ]+/)
 		.map(path => path.trim())
@@ -63,4 +78,7 @@ module.exports = Object.freeze({
 
 	MANAGER_IP: readFromEnvOrTerminate("MANAGER_IP"),
 	MANAGER_PORT: parseInt(process.env.MANAGER_PORT) || 3006,
+
+	HTTPS_KEY_PATH: readFromFsOrTerminate(process.env.HTTPS_KEY_PATH || "/ssl/ssl.key"),
+	HTTPS_CERT_PATH: readFromFsOrTerminate(process.env.HTTPS_CERT_PATH || "/ssl/ssl.cert"),
 });

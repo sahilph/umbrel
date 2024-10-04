@@ -4,6 +4,9 @@ const cookieParser = require('cookie-parser');
 const express = require('express');
 const waitPort = require('wait-port');
 
+const https = require("https");
+const fs = require("fs");
+
 const proxy = require('../utils/proxy.js');
 const umbrelRoutes = require('../routes/umbrel.js');
 const handleErrorMiddleware = require('../middleware/handle_error.js');
@@ -50,7 +53,16 @@ const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 	console.log(`${CONSTANTS.APP.name} is now ready...`);
 
-	const server = app.listen(CONSTANTS.PROXY_PORT, () => {
+	// Read SSL certificate and key files
+	const options = {
+	  key: fs.readFileSync(CONSTANTS.HTTPS_KEY_PATH),
+	  cert: fs.readFileSync(CONSTANTS.HTTPS_CERT_PATH),
+	};
+
+	// Create HTTPS server
+	const server = https.createServer(options, app);
+
+	server.listen(CONSTANTS.PROXY_PORT, () => {
 		console.log(`Listening on port: ${CONSTANTS.PROXY_PORT}`);
 	});
 
