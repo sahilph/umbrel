@@ -36,7 +36,7 @@ WORKDIR /app
 COPY containers/app-auth/yarn.lock containers/app-auth/package.json ./
 
 # Install dependencies
-RUN yarn
+RUN yarn --network-timeout 1000000
 
 # Copy project files and folders to the current working directory (i.e. '/app')
 COPY containers/app-auth .
