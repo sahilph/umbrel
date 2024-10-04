@@ -27,7 +27,7 @@ EXPOSE 2003
 CMD ["pnpm", "run", "app-auth:start"]
 
 # Build Stage
-FROM node:16-buster as umbrel-app-auth-builder
+FROM node:16-buster-slim as umbrel-app-auth-builder
 
 # Create app directory
 WORKDIR /app
