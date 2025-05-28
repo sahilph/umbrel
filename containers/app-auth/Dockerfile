@@ -1,5 +1,5 @@
 # UI build stage
-FROM node:18.19.1-buster-slim AS umbrel-app-auth-ui-builder
+FROM node:22.13.0-bookworm-slim AS umbrel-app-auth-ui-builder
 
 # Install pnpm
 RUN npm install -g pnpm@8
@@ -8,17 +8,17 @@ RUN npm install -g pnpm@8
 WORKDIR /app
 
 # Copy the package.json and package-lock.json
-COPY packages/ui/package.json ./
-COPY packages/ui/pnpm-lock.yaml ./
+COPY packages/ui/package.json ./ui/
+COPY packages/ui/pnpm-lock.yaml ./ui/
 
 # Install the dependencies
-RUN pnpm install
+RUN cd ui/ && pnpm install
 
 # Copy the rest of the files
-COPY packages/ui/ .
+COPY packages/ .
 
 # Build the app
-RUN pnpm run app-auth:build
+RUN cd ui/ && pnpm run app-auth:build
 
 # Expose the port
 EXPOSE 2003
@@ -48,7 +48,7 @@ FROM node:16-buster-slim AS umbrel-app-auth
 COPY --from=umbrel-app-auth-builder /app /app
 
 # Copy built ui to /app/dist
-COPY --from=umbrel-app-auth-ui-builder /app/dist-app-auth /app/dist
+COPY --from=umbrel-app-auth-ui-builder /app/ui/dist-app-auth /app/dist
 
 # Change directory to '/app'
 WORKDIR /app
