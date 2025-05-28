@@ -4,6 +4,9 @@ const cookieParser = require("cookie-parser");
 const express = require('express');
 const { StatusCodes } = require('http-status-codes');
 
+const https = require("https");
+const fs = require("fs");
+
 const authRoutes = require('../routes/auth.js');
 
 const handleErrorMiddleware = require('../middleware/handle_error.js');
@@ -22,6 +25,15 @@ app.use((req, res) => {
 	res.status(StatusCodes.NOT_FOUND).json();
 });
 
-app.listen(CONSTANTS.PORT, () => {
+// Read SSL certificate and key files
+const options = {
+  key: fs.readFileSync(CONSTANTS.HTTPS_KEY_PATH),
+  cert: fs.readFileSync(CONSTANTS.HTTPS_CERT_PATH),
+};
+
+// Create HTTPS server
+const server = https.createServer(options, app);
+
+server.listen(CONSTANTS.PORT, () => {
 	console.log(`Listening on port: ${CONSTANTS.PORT}`);
 });
